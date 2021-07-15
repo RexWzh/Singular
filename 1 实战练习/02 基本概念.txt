@@ -1,0 +1,9 @@
+###### 目标如下 ######
+1.环，理想，商环
+
+### 1.环，理想，商环 ###
+ring r=0,(x,y,z),lp;	//三个参数分别为：有理数域，多项式环，字典序
+		//0表示特征0域，xyz为不定元，lp代表lexicographical ordering
+ideal I=x,y,z; 	//x,y,z生成的理想
+basis = std(I);	//I的一组基元
+qring q=std(i);	//

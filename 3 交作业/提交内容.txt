@@ -1,0 +1,181 @@
+Singular 的简短介绍参看文献[3]，共26页。
+
+下边介绍 Singular 基本的使用，需要一定的C语言基础。
+在用singular 实现一些功能前，需先了解Singular的一些基本定义和规则。
+
+### 1.定义环，理想，商环 ###
+实例：
+ring R=0,(x,y),dp; //定义环Q[x,y]
+ideal I=x2-y2;  //x^2-y^2生成的R理想（可直接使用加法，乘法，幂次等操作）
+qring q=std(I); //商环R/I
+
+定义环
+0表示定义在特征0的素域上，即有理数域
+x,y为不定元名称
+dp代表单项式按阶数逆序，并按字典序排列
+若用lp，则代表单项式按字典序排列
+环R等价的定义方式为 ring R=QQ[x,y];
+
+理想定义中：
+等号右侧为相应生成元
+
+商环定义中：
+等号右侧为理想的基，std代表standard basis
+
+Singular 与其他语言有一点明显的区别，即基环的概念。
+每次定义环后，该环便为当前的基环，此时定义理想，模，多项式等都在该环上。
+而继续定义新的环或者商环，基环便改为新定义的环。
+用 basering 可查看当前基环，用 setring + 环，可以改变当前基环。
+
+### 2.多项式分解 ###
+通过多项式分解体会基环概念，蓝字为命令行显示的内容。
+
+ring b = (ZZ/2)[x]; //定义环(Z/2Z)[x]
+ring A = QQ[x]; //定义环Q[x]，此时基环为A
+poly f = (2*x2+x-3)^2; //f为A上多项式
+factorize(f,1); //求f的不可约因子
+_[1]=x-1
+_[2]=2x+3
+factorize(f,2); //求f的不可约因子及对应次数
+[1]:
+   _[1]=x-1
+   _[2]=2x+3
+[2]:
+   2,2
+//[1]中的两个元素为不可约因子，[2]中的两个元素为对应次数
+setring b; //设置基环为b
+poly f = imap(A,f); //将f映射到b上
+factorize(f,2); //求f的不可约因子及对应次数
+[1]:
+   _[1]=x+1
+[2]:
+   2
+此时f为环b上多项式，即(2*x2+x-3)^2=(x+1)^2
+
+### 2.定义模，向量 ###
+实例：
+ring R=3,(a,b),lp; //定义环(Z/3Z)[a,b]
+module m = freemodule(4); //定义自由模
+module m2 = [a,2,a+3],[b,1]; //定义R^3由(a,2,a+3)和(b,1,0)生成的子模
+module m3 = quotient(m,m2); //定义商模，m2自然视作R^4子模
+vector v = [a,b,1]; //v为R^3中的元素
+
+### 3.求模的零化子 ###
+定义环r，分别求r子模，r^2子模，r^2商模的零化子
+
+LIB "primdec.lib"; //导入函数库
+ring  r = 0,(x,y,z),lp; //定义环Q[x,y,z]，lp表示：单项式按字典序排列
+module M = x2-y2,z3; //r模M
+ideal a = Ann(M); //M的零化子
+print(a); //打印a的生成元
+z3
+x2-y2
+M = [1,x2],[y,x]; //生成r^2子模
+a = Ann(M); //求零化子
+print(a); 
+x2y-x
+qring Q=std(xy-1); //定义商环Q[x,y,z]/(xy-1)
+module M=imap(r,M); //M在商环中的像
+a = Ann(M); //计算此时的零化子
+print(a);
+0
+
+### 4.素域上的整扩张，代数扩张，超越扩张 ###
+以Z/5Z为例，求其代数扩张与超越扩张，整扩张同代数扩张
+
+ring r = (5,x),y,dp; // 环Z/5Z(x)[y]，其中x,y为超越元，且x为可逆元
+qring q1 = std(y); //商去y，得到超越扩张q1=Z/5Z(x)
+setring r; //基环回到r上
+minpoly = x3+1; //将x定义为代数元，此时r结构改变（只能定义一次，允许可约多项式）
+qring q2 = std(y); //得到代数扩张，q2=(Z/5Z)[x]/(x^3+1)
+q1; //超越扩张
+// coefficients: ZZ/5(x)
+// number of vars : 1
+//        block   1 : ordering dp
+//                  : names    y
+//        block   2 : ordering C
+// quotient ring from ideal ...
+q2; //代数扩张
+// coefficients: ZZ/5[x]/(x3+1)
+// number of vars : 1
+//        block   1 : ordering dp
+//                  : names    y
+//        block   2 : ordering C
+// quotient ring from ideal
+_[1]=y
+
+更细致的使用说明参见文献[2]，下边以准素分解为例，讨论Singular在交换代数中的应用
+
+### 准素分解 ###
+使用 LIB 命令调用函数库，函数的算法原理参看文献[1]。
+计算atiyah给出的准素分解例子
+LIB "primdec.lib"; //导入函数库
+ring A = 0,(x,y),dp;  //定义环k[x,y]
+ideal a=x2,xy;  //x^2,xy生成理想
+int t;
+t = timer; //计时器
+system("--ticks-per-sec",1000);  //计时单位为1/1000秒
+list L = primdecGTZ(a); // 计算准素分解
+print(timer-t);  //计算用时（毫秒）
+10
+print(L); //输出结果
+[1]:
+   [1]:
+      _[1]=x
+   [2]:
+      _[1]=x
+[2]:
+   [1]:
+      _[1]=y
+      _[2]=x2
+   [2]:
+      _[1]=x
+      _[2]=y
+输出内容有两个大块，说明理想a为两个准素理想之交。
+每个大块中，_[1]为准素理想，_[2]为对应素理想。
+上边结果相当于：q1=(x),p1=(x); q2=(y,x^2),p2=(x,y);
+q1,q2为准素理想，p1,p2为素理想。
+
+Singular支持更复杂的理想分解，考虑8元多项式环上7个元素生成的理想
+ring R = 0, (a,b,c,d,e,f,g,h), dp; //定义环
+ideal I = a+c+d-e-h, 2df+2cg+2eh-2h2-h-1,
+3df2+3cg2-3eh2+3h3+3h2-e+4h,
+6bdg-6eh2+6h3-3eh+6h2-e+4h,
+4df3+4cg3+4eh3-4h4-6h3+4eh-10h2-h-1,
+8bdfg+8eh3-8h4+4eh2-12h3+4eh-14h2-3h-1,
+12bdg2+12eh3-12h4+12eh2-18h3+8eh-14h2-h-1,
+-24eh3+24h4-24eh2+36h3-8eh+26h2+7h+1;
+LIB "primdec.lib";
+int aa = timer;
+list PD = primdecGTZ(I);
+print(timer-aa); //计算用时
+8
+print(size(PD)); //准素理想的个数
+9
+
+### 其他应用 ###
+Singular 提供了很多实用的函数库。
+例如 "primdec.lib" 提供理想的准素分解计算，radical计算，以及求模的零化子计算等工具。
+1.由 Hilbert 基定理，诺特环上有限生成代数诺特，函数库"sagbi.lib"给出了相关工具。
+
+2.多项式方程的零点问题是代数几何很关心的一个内容，函数库"solve.lib"和"triang.lib"提供了相关工具。
+
+3.李理论也用了代数几何知识（文献[4]）
+第3章，cartan子代数唯一性的证明，核心方法是代数几何思想证明多项式f的性质。
+第11章用hilbert基定理和zariski拓扑等性质，证明这五个代数的结构与n元多项式同构。
+
+P236以A1李代数为例，求出相应的代数无关元。
+
+一个自然的想法是：对任意给定李代数，怎么计算代数无关元。
+前四个代数为群作用不变多项式，Singular 在这方面也有相关函数库。
+具体去算需要把代数的整个构造过程，用到的定理引理弄清楚，这里先留作问题吧。
+
+
+
+
+
+
+
+
+
+

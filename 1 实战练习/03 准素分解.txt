@@ -1,0 +1,49 @@
+###### 准素分解 ######
+1.准素分解
+2.计算radical
+3.计时器
+
+### 1.准素分解 ###
+LIB "primdec.lib";
+ring A = 0,(x,y),dp;  //定义环k[x,y]
+ideal a=x2,xy;  //x^2,xy生成理想
+int t;
+t = timer; //计时器
+system("--ticks-per-sec",1000);  //设置单位为1/1000秒
+list L = primdecGTZ(a); // 计算准素分解
+print(timer-t);  //计算用时（毫秒）
+print(L); //输出结果
+
+## 给出的示例
+ring R = 0, (a,b,c,d,e,f,g,h), dp; // 8个不定元的多项环
+ideal I = a+c+d-e-h, 2df+2cg+2eh-2h2-h-1,
+3df2+3cg2-3eh2+3h3+3h2-e+4h,
+6bdg-6eh2+6h3-3eh+6h2-e+4h,
+4df3+4cg3+4eh3-4h4-6h3+4eh-10h2-h-1,
+8bdfg+8eh3-8h4+4eh2-12h3+4eh-14h2-3h-1,
+12bdg2+12eh3-12h4+12eh2-18h3+8eh-14h2-h-1,
+-24eh3+24h4-24eh2+36h3-8eh+26h2+7h+1;
+LIB "primdec.lib";
+int aa = timer;
+list PD = primdecGTZ(I);
+print(timer-aa); // time in seconds
+print(size(PD));
+
+
+### 2.计算radical ###
+LIB "primdec.lib";
+ring  r = 0,(x,y,z),dp;
+poly  p = z2+1;
+poly  q = z3+2;
+ideal i = p*q^2,y-z2;
+ideal pr = radical(i);
+pr;
+
+
+### 3.计时器 ###
+system("--ticks-per-sec",1000);  //设置为1/1000秒，即毫秒
+int t = timer;
+// 操作内容
+print(timer-t);
+
+

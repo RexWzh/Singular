@@ -1,0 +1,56 @@
+###### 目标如下 ######
+1.随便摸索
+2.设置环境变量
+
+### 1.随便摸索 ###
+#1.输入运行
+cd "/cygdrive/f/work_space/Singular/2 工作目录"
+/cygdrive/d/software/singular/bin/Singular.exe
+
+#2.快捷操作
+ctrl+P：previous command
+ctrl+N：next command
+ctrl+B：光标cursor 退一个
+ctrl+F：cursor forward
+ctrl+insert 复制
+shift + insert 粘贴
+help或? + 内容，查看帮助（跳出html界面）
+
+#3.数据类型
+int 整数类型
+
+intmat 二维矩阵（默认生成零矩阵）
+例：intmat mm[2][2] = 1,2;
+
+string 字符串
+
+#4.语句结构（必须使用大括号）
+#循环结构
+#for循环
+int i;
+for(i=1;i<=3;i++)
+{print(i);}
+
+#允许内部声明变量（类似C++）
+for(int j=1;j<5;j++)
+{print(j);}
+
+#while 循环
+i=1;
+while(i<3)
+{print(i);
+i++;}
+
+#if-else
+if(1==2){print(3);}
+else {print(2);}
+
+
+#其他内容
+1.变量必须先声明类型，且不可以重复声明
+2.execut(s) //执行字符串内容
+3.语句用逗号隔开，则输出结果空格隔开；
+语句用分号隔开，则输出结果换行显示。
+4.write("filename.txt",1,2,"3"); // 结果换行显示，文件在cygwin所在运行目录上。
+5.read("filename.txt");
+6.<"filename.txt"; //执行文件，效果等同于excute(read("filename.txt"));
